@@ -21,7 +21,22 @@ configurations {
 }
 
 repositories {
+	mavenLocal()
+	def nexusRepoUrl = 'http://nexus.ck.tothenew.net/repository/CloudKeeper_prod/'
+
+	if (nexusRepoUrl) {
+		maven {
+			name = "Cloudkeeper"
+			url = uri(nexusRepoUrl)
+			allowInsecureProtocol = true
+		}
+	}
 	mavenCentral()
+
+	maven {
+		url "http://redshift-maven-repository.s3-website-us-east-1.amazonaws.com/release"
+		allowInsecureProtocol = true
+	}
 }
 
 ext {
@@ -29,6 +44,14 @@ ext {
 }
 
 dependencies {
+
+	implementation('com.ttn.ck:core:1.0.15')
+	implementation('com.ttn.ck:dtos:1.0.55')
+	implementation('com.ttn.ck:errorhandler:1.0.0')
+	implementation('com.ttn.ck:authX:1.0.3')
+	implementation('com.ttn.ck:snowplug:1.0.8')
+	implementation('com.ttn.ck:queryprocessor:1.0.5')
+	implementation('com.ttn.ck:mqpublisher:1.0.0')
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -61,4 +84,10 @@ dependencyManagement {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+jar {
+	manifest {
+		attributes('Class-Path': configurations.collect { it.getName() }.join(' '), 'Main-Class': 'com.ttn.ck.apn.ApnOpportunityApplication')
+	}
 }

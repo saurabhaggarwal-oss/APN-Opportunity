@@ -1,6 +1,7 @@
 package com.ttn.ck.apn.service;
 
 import com.ttn.ck.apn.dto.MasterDataFilterRequest;
+import com.ttn.ck.apn.dto.OpportunityData;
 import com.ttn.ck.apn.dto.RaiseOpportunityRequest;
 import com.ttn.ck.apn.model.ApnOpportunityMasterData;
 import com.ttn.ck.apn.model.ApnOpportunityRawData;
@@ -20,7 +21,7 @@ public interface ApnOpportunityDataService {
      * @param request filter criteria (startDate, endDate, opportunityRaised)
      * @return list of matching master data records
      */
-    List<ApnOpportunityMasterData> listMasterDataByStatus(MasterDataFilterRequest request);
+    List<OpportunityData> listMasterDataByStatus(MasterDataFilterRequest request);
 
     /**
      * Fetch master data records by UUIDs for export.

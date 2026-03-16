@@ -1,17 +1,16 @@
 package com.ttn.ck.apn.service;
 
-import com.ttn.ck.apn.exception.ExcelExportException;
 import com.ttn.ck.apn.model.ApnOpportunityMasterData;
 import com.ttn.ck.apn.model.ApnOpportunityRawData;
+import com.ttn.ck.errorhandler.exceptions.GenericStatusException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -20,22 +19,17 @@ import java.util.List;
  * Produces styled workbooks with headers, auto-sized columns, and
  * properly formatted date/number cells.
  */
+
+@Slf4j
 @Service
 public class ExcelExportService {
-
-    private static final Logger log = LoggerFactory.getLogger(ExcelExportService.class);
-    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-    // ═══════════════════════════════════════════════════════════════════════
-    //  Master Data Export
-    // ═══════════════════════════════════════════════════════════════════════
 
     /**
      * Generates an Excel file containing master opportunity data.
      *
      * @param records list of master data records to export
      * @return byte array of the .xlsx file
-     * @throws ExcelExportException if file generation fails
+     * @throws GenericStatusException if file generation fails
      */
     public byte[] exportMasterData(List<ApnOpportunityMasterData> records) {
         log.info("Generating master data Excel for {} records", records.size());
@@ -105,20 +99,16 @@ public class ExcelExportService {
             return toByteArray(workbook);
 
         } catch (IOException e) {
-            throw new ExcelExportException("Failed to generate master data Excel", e);
+            throw new GenericStatusException("Failed to generate master data Excel", HttpStatus.BAD_REQUEST.value());
         }
     }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    //  Raw Data Export
-    // ═══════════════════════════════════════════════════════════════════════
 
     /**
      * Generates an Excel file containing raw opportunity data.
      *
      * @param records list of raw data records to export
      * @return byte array of the .xlsx file
-     * @throws ExcelExportException if file generation fails
+     * @throws GenericStatusException if file generation fails
      */
     public byte[] exportRawData(List<ApnOpportunityRawData> records) {
         log.info("Generating raw data Excel for {} records", records.size());
@@ -189,13 +179,9 @@ public class ExcelExportService {
             return toByteArray(workbook);
 
         } catch (IOException e) {
-            throw new ExcelExportException("Failed to generate raw data Excel", e);
+            throw new GenericStatusException("Failed to generate raw data Excel", HttpStatus.BAD_REQUEST.value());
         }
     }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    //  Styling Utilities
-    // ═══════════════════════════════════════════════════════════════════════
 
     /**
      * Creates a bold, light-grey-background header cell style.
@@ -224,10 +210,6 @@ public class ExcelExportService {
         style.setDataFormat(helper.createDataFormat().getFormat("yyyy-mm-dd hh:mm:ss"));
         return style;
     }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    //  Cell Value Helpers
-    // ═══════════════════════════════════════════════════════════════════════
 
     private String nullSafe(String value) {
         return value != null ? value : "";

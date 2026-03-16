@@ -1,9 +1,9 @@
-package com.ttn.ck.apn.service;
+package com.ttn.ck.apn.service.impl;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ttn.ck.apn.model.ApnOpportunityMasterData;
 import com.ttn.ck.apn.model.ApnOpportunityRawData;
+import com.ttn.ck.apn.service.WorkloadGenerationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
@@ -14,7 +14,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**

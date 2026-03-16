@@ -35,8 +35,8 @@ public class OpportunityRefreshProducer {
      * @param message the refresh message containing UUID and metadata
      */
     public void sendRefreshMessage(RefreshMessage message) {
-        log.info("Publishing refresh message for UUID: {}", message.getUuid());
+        log.info("Publishing refresh message for: {}", message);
         rabbitTemplate.convertAndSend(exchangeName, routingKey, message);
-        log.debug("Message published successfully for UUID: {}", message.getUuid());
+        log.debug("Message published successfully for: {}", message);
     }
 }

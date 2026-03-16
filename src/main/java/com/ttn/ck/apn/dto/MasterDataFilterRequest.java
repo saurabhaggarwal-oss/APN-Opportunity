@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 /**
  * Request DTO for filtering master opportunity data.
  * Used by the listing API to filter by date range and raised status.
- *
  * Example request params:
  *   GET /apn-opportunities/master?startDate=2026-01-01&endDate=2026-03-12&opportunityRaised=true
  */

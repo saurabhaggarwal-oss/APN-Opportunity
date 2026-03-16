@@ -1,16 +1,15 @@
 package com.ttn.ck.apn.controller;
 
-import com.ttn.ck.apn.dto.ApiResponse;
 import com.ttn.ck.apn.dto.ExportRequest;
 import com.ttn.ck.apn.dto.MasterDataFilterRequest;
+import com.ttn.ck.apn.dto.OpportunityData;
 import com.ttn.ck.apn.dto.RaiseOpportunityRequest;
-import com.ttn.ck.apn.model.ApnOpportunityMasterData;
 import com.ttn.ck.apn.model.ApnOpportunityRawData;
 import com.ttn.ck.apn.service.ApnOpportunityDataService;
+import com.ttn.ck.core.response.SuccessResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -31,18 +30,13 @@ import java.util.List;
  *   <li>{@code POST /apn-opportunities/refresh}             — Trigger async refresh</li>
  * </ul>
  */
+@Slf4j
 @RestController
 @RequestMapping("/apn-opportunities")
 @RequiredArgsConstructor
 public class ApnOpportunityDataController {
 
-    private static final Logger log = LoggerFactory.getLogger(ApnOpportunityDataController.class);
-
     private final ApnOpportunityDataService service;
-
-    // ═══════════════════════════════════════════════════════════════════════
-    //  1. GET /apn-opportunities/master — Listing by Status
-    // ═══════════════════════════════════════════════════════════════════════
 
     /**
      * Fetches master opportunity data filtered by raised status and date range.
@@ -56,29 +50,20 @@ public class ApnOpportunityDataController {
      * @return list of matching master data records
      */
     @GetMapping("/master")
-    public ResponseEntity<ApiResponse<List<ApnOpportunityMasterData>>> listMasterDataByStatus(
+    public SuccessResponseDto<List<OpportunityData>> listMasterDataByStatus(
             @RequestParam String startDate,
             @RequestParam String endDate,
             @RequestParam Boolean opportunityRaised) {
 
-        log.info("GET /master — startDate={}, endDate={}, raised={}",
-                startDate, endDate, opportunityRaised);
-
+        log.info("GET /master — startDate={}, endDate={}, raised={}", startDate, endDate, opportunityRaised);
         MasterDataFilterRequest request = MasterDataFilterRequest.builder()
                 .startDate(startDate)
                 .endDate(endDate)
                 .opportunityRaised(opportunityRaised)
                 .build();
 
-        List<ApnOpportunityMasterData> data = service.listMasterDataByStatus(request);
-
-        return ResponseEntity.ok(
-                ApiResponse.success("Master data fetched successfully", data));
+        return new SuccessResponseDto<>(service.listMasterDataByStatus(request));
     }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    //  2. POST /apn-opportunities/master/export — Export Master Data
-    // ═══════════════════════════════════════════════════════════════════════
 
     /**
      * Exports selected master data records to an Excel file.
@@ -111,10 +96,6 @@ public class ApnOpportunityDataController {
                 .body(excelFile);
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
-    //  3. GET /apn-opportunities/raw/{uuid} — Raw Data by UUID
-    // ═══════════════════════════════════════════════════════════════════════
-
     /**
      * Fetches all raw opportunity data records for a given UUID.
      *
@@ -125,20 +106,10 @@ public class ApnOpportunityDataController {
      * @return list of raw data records
      */
     @GetMapping("/raw/{uuid}")
-    public ResponseEntity<ApiResponse<List<ApnOpportunityRawData>>> getRawData(
-            @PathVariable String uuid) {
-
-        log.info("GET /raw/{}", uuid);
-
-        List<ApnOpportunityRawData> data = service.getRawDataByUuid(uuid);
-
-        return ResponseEntity.ok(
-                ApiResponse.success("Raw data fetched successfully", data));
+    public SuccessResponseDto<List<ApnOpportunityRawData>> getRawData(@PathVariable String uuid) {
+        return new SuccessResponseDto<>(service.getRawDataByUuid(uuid));
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
-    //  4. GET /apn-opportunities/raw/export/{uuid} — Export Raw Data
-    // ═══════════════════════════════════════════════════════════════════════
 
     /**
      * Exports raw data for a UUID to an Excel file.
@@ -164,10 +135,6 @@ public class ApnOpportunityDataController {
                 .body(excelFile);
     }
 
-    // ═══════════════════════════════════════════════════════════════════════
-    //  5. POST /apn-opportunities/raise — Raise Opportunity
-    // ═══════════════════════════════════════════════════════════════════════
-
     /**
      * Raises or clears an opportunity status.
      *
@@ -184,23 +151,12 @@ public class ApnOpportunityDataController {
      * @return success response
      */
     @PostMapping("/raise")
-    public ResponseEntity<ApiResponse<Void>> raiseOpportunity(
-            @Valid @RequestBody RaiseOpportunityRequest request) {
+    public SuccessResponseDto<Boolean> raiseOpportunity(@Valid @RequestBody RaiseOpportunityRequest request) {
 
         log.info("POST /raise — uuid={}, raised={}", request.getUuid(), request.getRaised());
-
         service.raiseOpportunity(request);
-
-        String message = Boolean.TRUE.equals(request.getRaised())
-                ? "Opportunity raised successfully"
-                : "Opportunity cleared successfully";
-
-        return ResponseEntity.ok(ApiResponse.success(message));
+        return new SuccessResponseDto<>(Boolean.TRUE);
     }
-
-    // ═══════════════════════════════════════════════════════════════════════
-    //  6. POST /apn-opportunities/refresh — Trigger Refresh
-    // ═══════════════════════════════════════════════════════════════════════
 
     /**
      * Triggers an asynchronous refresh job.
@@ -213,13 +169,9 @@ public class ApnOpportunityDataController {
      * @return acknowledgment response
      */
     @PostMapping("/refresh")
-    public ResponseEntity<ApiResponse<Void>> triggerRefresh() {
+    public SuccessResponseDto<Boolean> triggerRefresh() {
         log.info("POST /refresh — triggering async refresh");
-
         service.triggerRefresh();
-
-        return ResponseEntity.accepted()
-                .body(ApiResponse.success(
-                        "Refresh triggered successfully. Processing in background."));
+        return new SuccessResponseDto<>(Boolean.TRUE);
     }
 }
