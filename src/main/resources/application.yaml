@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: Apn Opportunity
+
+  # ── Snowflake Datasource ────────────────────────────────────────────────
+  # Replace placeholders with actual Snowflake credentials
+  datasource:
+    url: jdbc:snowflake://<ACCOUNT>.snowflakecomputing.com/?db=<DATABASE>&schema=<SCHEMA>&warehouse=<WAREHOUSE>
+    username: ${SNOWFLAKE_USERNAME:your-username}
+    password: ${SNOWFLAKE_PASSWORD:your-password}
+    driver-class-name: net.snowflake.client.jdbc.SnowflakeDriver
+
+  # ── JPA / Hibernate ────────────────────────────────────────────────────
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  # ── Spring AI – OpenAI ─────────────────────────────────────────────────
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:your-api-key}
+      chat:
+        options:
+          model: gpt-4o
+          temperature: 0.2
+
+  # ── RabbitMQ ─────────────────────────────────────────────────────────
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    listener:
+      simple:
+        retry:
+          enabled: true
+          initial-interval: 1000
+          max-attempts: 3
+          max-interval: 10000
+          multiplier: 2.0
+
+  # ── Disable auto-config for services not yet in use ────────────────────
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
+
+server:
+  port: 8080
+
+# ── Custom Application Properties ──────────────────────────────────────
+app:
+  rabbitmq:
+    queue:
+      opportunity-refresh: opportunity-refresh-queue
+    exchange:
+      opportunity: opportunity-exchange
+    routing-key:
+      opportunity-refresh: opportunity.refresh
+
