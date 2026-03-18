@@ -42,20 +42,45 @@ public interface ApnOpportunityDataDao {
     void updateOpportunityRaised(Set<String> uuids, Boolean raised);
 
     /**
-     * Upsert (insert or update) a master data record.
-     * Used by the refresh job after ChatGPT processing.
-     *
-     * @param data the master data to upsert
-     * @return number of rows affected
-     */
-    int upsertMasterData(ApnOpportunityMasterData data);
-
-    /**
      * Fetch all raw data records for a given UUID.
      *
      * @param uuid the lineitem UUID to look up
      * @return list of raw data records
      */
     List<ApnOpportunityRawData> findRawDataByUuid(String uuid);
+
+    /**
+     * Fetch all unprocessed raw data records that do not have workload details generated yet.
+     * 
+     * @return list of unprocessed raw data records
+     */
+    List<ApnOpportunityRawData> fetchUnprocessedRawData();
+
+    /**
+     * Update the workload title and description for a specific raw data lineitem.
+     * 
+     * @param lineitemUuid the lineitem UUID
+     * @param workloadTitle the generated workload title
+     * @param workloadDescription the generated workload description
+     */
+    void updateWorkloadDetailsByLineItemUuid(String lineitemUuid, String workloadTitle, String workloadDescription);
+
+    /**
+     * Insert into opportunity master table based on the processed event data.
+     * 
+     * @param customerName the customer name
+     * @param partnerName the partner name
+     * @param workloadDescription the workload description as per requirement
+     */
+    void insertOpportunityMasterData(String customerName, String partnerName, String workloadDescription);
+
+    /**
+     * Insert into opportunity mapping table based on the processed event data.
+     * 
+     * @param customerName the customer name
+     * @param partnerName the partner name
+     * @param workloadDescription the workload description as per requirement
+     */
+    void insertOpportunityMappingData(String customerName, String partnerName, String workloadDescription);
 
 }

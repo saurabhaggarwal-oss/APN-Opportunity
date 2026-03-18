@@ -26,4 +26,16 @@ public class ApnOpportunityQueries {
     @Value("${update.opportunity.raise.status}")
     String updateOpportunityRaiseStatus;
 
+    @Value("${opportunity.unprocessed.raw.data}")
+    String opportunityUnprocessedRawData;
+
+    @Value("${update.apn.opportunity.raw.data.by.lineitem.uuid}")
+    String updateOpportunityRawDataByLineitemUuid;
+
+    @Value("${insert.opportunity.master.data}")
+    String insertOpportunityMasterData;
+
+    @Value("${insert.opportunity.mapping.data}")
+    String insertOpportunityMappingData;
+
 }

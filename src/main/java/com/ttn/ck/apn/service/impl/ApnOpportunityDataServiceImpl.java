@@ -122,7 +122,7 @@ public class ApnOpportunityDataServiceImpl implements ApnOpportunityDataService 
     public void raiseOpportunity(RaiseOpportunityRequest request) {
         log.info("Raise opportunity: uuid={}, raised={}", request.getUuid(), request.getRaised());
         dao.updateOpportunityRaised(request.getUuid(), request.getRaised());
-        log.info("Opportunity {} successfully {}", request.getUuid(), request.getRaised() ? "raised" : "cleared");
+        log.info("Opportunity {} successfully {}", request.getUuid(), Boolean.TRUE.equals(request.getRaised()) ? "raised" : "cleared");
     }
 
     /**

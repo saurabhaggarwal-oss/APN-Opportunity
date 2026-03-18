@@ -62,17 +62,49 @@ public class ApnOpportunityDataDaoImpl implements ApnOpportunityDataDao {
     }
 
     @Override
-    public int upsertMasterData(ApnOpportunityMasterData data) {
-        log.debug("Upserting master data for UUID: {}", data.getLineitemUuid());
-        return 0;
-    }
-
-    @Override
     public List<ApnOpportunityRawData> findRawDataByUuid(String uuid) {
         log.debug("Fetching raw data for UUID: {}", uuid);
         Map<String, Object> param = new HashMap<>();
         param.put("masterUuid", uuid);
         return QueryExecutor.getDynamicResult(opportunityQueries.getOpportunityRawDataByMasterUuid(), param, ApnOpportunityRawData.class);
+    }
+
+    @Override
+    public List<ApnOpportunityRawData> fetchUnprocessedRawData() {
+        log.debug("Fetching unprocessed raw data");
+        return QueryExecutor.getDynamicResult(opportunityQueries.getOpportunityUnprocessedRawData(), new HashMap<>(), ApnOpportunityRawData.class);
+    }
+
+    @Override
+    public void updateWorkloadDetailsByLineItemUuid(String lineitemUuid, String workloadTitle, String workloadDescription) {
+        log.info("Updating workload details for lineitem UUID: {}", lineitemUuid);
+        Map<String, Object> param = new HashMap<>();
+        param.put("lineitemUuid", lineitemUuid);
+        param.put("workloadTitle", workloadTitle);
+        param.put("workloadDescription", workloadDescription);
+        int records = PersistenceQueryExecutor.save(opportunityQueries.getUpdateOpportunityRawDataByLineitemUuid(), param);
+        log.debug("{} opportunity raw data workload details updated", records);
+    }
+
+    @Override
+    public void insertOpportunityMasterData(String customerName, String partnerName, String workloadDescription) {
+        log.info("Inserting opportunity master data for customer: {}", customerName);
+        Map<String, Object> param = new HashMap<>();
+        param.put("customerName", customerName);
+        param.put("workloadDescription", workloadDescription);
+        int records = PersistenceQueryExecutor.save(opportunityQueries.getInsertOpportunityMasterData(), param);
+        log.debug("{} opportunity master data inserted", records);
+    }
+
+    @Override
+    public void insertOpportunityMappingData(String customerName, String partnerName, String workloadDescription) {
+        log.info("Inserting opportunity mapping data for customer: {}", customerName);
+        Map<String, Object> param = new HashMap<>();
+        param.put("customerName", customerName);
+        param.put("accountId", partnerName);
+        param.put("workloadDescription", workloadDescription);
+        int records = PersistenceQueryExecutor.save(opportunityQueries.getInsertOpportunityMappingData(), param);
+        log.debug("{} opportunity mapping data inserted", records);
     }
 
 }

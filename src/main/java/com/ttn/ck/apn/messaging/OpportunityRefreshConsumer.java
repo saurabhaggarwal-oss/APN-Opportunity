@@ -1,6 +1,5 @@
 package com.ttn.ck.apn.messaging;
 
-import com.ttn.ck.apn.dao.ApnOpportunityDataDao;
 import com.ttn.ck.apn.service.WorkloadGenerationService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -26,13 +25,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class OpportunityRefreshConsumer {
 
-    private final ApnOpportunityDataDao dao;
     private final WorkloadGenerationService workloadGenerationService;
 
-    public OpportunityRefreshConsumer(
-            ApnOpportunityDataDao dao,
-            WorkloadGenerationService workloadGenerationService) {
-        this.dao = dao;
+    public OpportunityRefreshConsumer(WorkloadGenerationService workloadGenerationService) {
         this.workloadGenerationService = workloadGenerationService;
     }
 
@@ -50,6 +45,6 @@ public class OpportunityRefreshConsumer {
      */
     @RabbitListener(queues = "${app.rabbitmq.queue.opportunity-refresh}")
     public void handleRefreshMessage(RefreshMessage message) {
-
+        workloadGenerationService.processUnprocessedWorkloads(message);
     }
 }
