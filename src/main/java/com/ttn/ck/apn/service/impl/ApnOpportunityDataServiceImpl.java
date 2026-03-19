@@ -4,14 +4,13 @@ import com.ttn.ck.apn.dao.ApnOpportunityDataDao;
 import com.ttn.ck.apn.dto.MasterDataFilterRequest;
 import com.ttn.ck.apn.dto.OpportunityData;
 import com.ttn.ck.apn.dto.RaiseOpportunityRequest;
+import com.ttn.ck.apn.errorhandler.GenericStatusException;
 import com.ttn.ck.apn.messaging.OpportunityRefreshProducer;
 import com.ttn.ck.apn.messaging.RefreshMessage;
 import com.ttn.ck.apn.model.ApnOpportunityMasterData;
 import com.ttn.ck.apn.model.ApnOpportunityRawData;
 import com.ttn.ck.apn.service.ApnOpportunityDataService;
 import com.ttn.ck.apn.service.ExcelExportService;
-import com.ttn.ck.authX.service.AuthorizedUserService;
-import com.ttn.ck.errorhandler.exceptions.GenericStatusException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,7 +31,6 @@ import java.util.List;
 @AllArgsConstructor
 public class ApnOpportunityDataServiceImpl implements ApnOpportunityDataService {
 
-    private final AuthorizedUserService authorizedUserService;
     private final ApnOpportunityDataDao dao;
     private final ExcelExportService excelExportService;
     private final OpportunityRefreshProducer refreshProducer;
@@ -133,7 +131,7 @@ public class ApnOpportunityDataServiceImpl implements ApnOpportunityDataService 
     @Override
     public void triggerRefresh() {
         log.info("Triggering opportunity refresh job");
-        String partnerName = authorizedUserService.getPartnerName();
+        String partnerName = "CK AZ";
         RefreshMessage message = getRefreshMessage(partnerName);
         refreshProducer.sendRefreshMessage(message);
         log.info("All refresh messages published successfully");

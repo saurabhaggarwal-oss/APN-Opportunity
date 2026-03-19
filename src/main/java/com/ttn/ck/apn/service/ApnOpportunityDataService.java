@@ -3,7 +3,6 @@ package com.ttn.ck.apn.service;
 import com.ttn.ck.apn.dto.MasterDataFilterRequest;
 import com.ttn.ck.apn.dto.OpportunityData;
 import com.ttn.ck.apn.dto.RaiseOpportunityRequest;
-import com.ttn.ck.apn.model.ApnOpportunityMasterData;
 import com.ttn.ck.apn.model.ApnOpportunityRawData;
 
 import java.util.List;

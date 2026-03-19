@@ -1,5 +1,6 @@
 package com.ttn.ck.apn.messaging;
 
+import com.ttn.ck.apn.config.RabbitMQConfig;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,7 +11,7 @@ import java.util.Date;
 
 /**
  * Message POJO sent through RabbitMQ for the opportunity refresh flow.
- * <p>Serialized as JSON via Jackson (configured in {@link com.ttn.ck.apn.config.RabbitMQConfig}).</p>
+ * <p>Serialized as JSON via Jackson (configured in {@link RabbitMQConfig}).</p>
  */
 @Data
 @Builder

@@ -1,8 +1,8 @@
 package com.ttn.ck.apn.service;
 
+import com.ttn.ck.apn.errorhandler.GenericStatusException;
 import com.ttn.ck.apn.model.ApnOpportunityMasterData;
 import com.ttn.ck.apn.model.ApnOpportunityRawData;
-import com.ttn.ck.errorhandler.exceptions.GenericStatusException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -60,35 +60,35 @@ public class ExcelExportService {
             // Populate data rows
             CellStyle dateStyle = createDateStyle(workbook);
             for (int rowIdx = 0; rowIdx < records.size(); rowIdx++) {
-                ApnOpportunityMasterData record = records.get(rowIdx);
+                ApnOpportunityMasterData opportunityMasterData = records.get(rowIdx);
                 Row row = sheet.createRow(rowIdx + 1);
 
                 int col = 0;
-                row.createCell(col++).setCellValue(nullSafe(record.getLineitemUuid()));
-                row.createCell(col++).setCellValue(nullSafe(record.getCustomerName()));
-                row.createCell(col++).setCellValue(nullSafe(record.getCustomerCompanyName()));
-                row.createCell(col++).setCellValue(nullSafe(record.getIndustry()));
-                row.createCell(col++).setCellValue(nullSafe(record.getCountry()));
-                row.createCell(col++).setCellValue(nullSafe(record.getState()));
-                row.createCell(col++).setCellValue(nullSafe(record.getPartnerProjectTitle()));
-                row.createCell(col++).setCellValue(nullSafe(record.getCustomerBusinessProblem()));
-                row.createCell(col++).setCellValue(nullSafe(record.getSolutionOffered()));
-                row.createCell(col++).setCellValue(nullSafe(record.getUseCase()));
-                setCellDouble(row.createCell(col++), record.getEstimatedMonthlyRevenue());
-                setCellDate(row.createCell(col++), record.getTargetCloseDate(), dateStyle);
-                row.createCell(col++).setCellValue(nullSafe(record.getOpportunityType()));
-                row.createCell(col++).setCellValue(nullSafe(record.getDeliveryModel()));
-                row.createCell(col++).setCellValue(nullSafe(record.getSalesActivity()));
-                row.createCell(col++).setCellValue(nullSafe(record.getLineitemUsageaccountid()));
-                row.createCell(col++).setCellValue(record.getOpportunityRaised() != null
-                        ? record.getOpportunityRaised().toString() : "");
-                setCellDate(row.createCell(col++), record.getOpportunityRaisedDate(), dateStyle);
-                row.createCell(col++).setCellValue(nullSafe(record.getOpportunityRaisedBy()));
-                row.createCell(col++).setCellValue(nullSafe(record.getCloudPlatform()));
-                row.createCell(col++).setCellValue(nullSafe(record.getPartnerName()));
-                setCellDate(row.createCell(col++), record.getLoggedDate(), dateStyle);
-                setCellDate(row.createCell(col++), record.getCreatedDate(), dateStyle);
-                setCellDate(row.createCell(col++), record.getModifiedDate(), dateStyle);
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getLineitemUuid()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getCustomerName()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getCustomerCompanyName()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getIndustry()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getCountry()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getState()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getPartnerProjectTitle()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getCustomerBusinessProblem()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getSolutionOffered()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getUseCase()));
+                setCellDouble(row.createCell(col++), opportunityMasterData.getEstimatedMonthlyRevenue());
+                setCellDate(row.createCell(col++), opportunityMasterData.getTargetCloseDate(), dateStyle);
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getOpportunityType()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getDeliveryModel()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getSalesActivity()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getLineitemUsageaccountid()));
+                row.createCell(col++).setCellValue(opportunityMasterData.getOpportunityRaised() != null
+                        ? opportunityMasterData.getOpportunityRaised().toString() : "");
+                setCellDate(row.createCell(col++), opportunityMasterData.getOpportunityRaisedDate(), dateStyle);
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getOpportunityRaisedBy()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getCloudPlatform()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getPartnerName()));
+                setCellDate(row.createCell(col++), opportunityMasterData.getLoggedDate(), dateStyle);
+                setCellDate(row.createCell(col++), opportunityMasterData.getCreatedDate(), dateStyle);
+                setCellDate(row.createCell(col++), opportunityMasterData.getModifiedDate(), dateStyle);
             }
 
             // Auto-size columns for readability
@@ -138,37 +138,37 @@ public class ExcelExportService {
             // Populate data rows
             CellStyle dateStyle = createDateStyle(workbook);
             for (int rowIdx = 0; rowIdx < records.size(); rowIdx++) {
-                ApnOpportunityRawData record = records.get(rowIdx);
+                ApnOpportunityRawData opportunityRawData = records.get(rowIdx);
                 Row row = sheet.createRow(rowIdx + 1);
 
                 int col = 0;
-                row.createCell(col++).setCellValue(nullSafe(record.getLineitemUuid()));
-                row.createCell(col++).setCellValue(nullSafe(record.getCustomerName()));
-                row.createCell(col++).setCellValue(nullSafe(record.getLineitemUsageaccountid()));
-                row.createCell(col++).setCellValue(nullSafe(record.getServiceName()));
-                row.createCell(col++).setCellValue(nullSafe(record.getMycloudRegionname()));
-                row.createCell(col++).setCellValue(nullSafe(record.getMycloudOperatingsystem()));
-                row.createCell(col++).setCellValue(nullSafe(record.getLineitemResourceid()));
-                row.createCell(col++).setCellValue(nullSafe(record.getMycloudInstancetype()));
-                row.createCell(col++).setCellValue(nullSafe(record.getProductcode()));
-                row.createCell(col++).setCellValue(nullSafe(record.getFinalNameTag()));
-                row.createCell(col++).setCellValue(nullSafe(record.getFinalAutoscalingName()));
-                row.createCell(col++).setCellValue(nullSafe(record.getKey()));
-                row.createCell(col++).setCellValue(nullSafe(record.getWorkloadTitle()));
-                row.createCell(col++).setCellValue(nullSafe(record.getWorkloadDescription()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getLineitemUuid()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getCustomerName()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getLineitemUsageaccountid()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getServiceName()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getMycloudRegionname()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getMycloudOperatingsystem()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getLineitemResourceid()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getMycloudInstancetype()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getProductcode()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getFinalNameTag()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getFinalAutoscalingName()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getKey()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getWorkloadTitle()));
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getWorkloadDescription()));
 
                 // BigDecimal cost
-                if (record.getTotalPeriodCost() != null) {
-                    row.createCell(col++).setCellValue(record.getTotalPeriodCost().doubleValue());
+                if (opportunityRawData.getTotalPeriodCost() != null) {
+                    row.createCell(col++).setCellValue(opportunityRawData.getTotalPeriodCost().doubleValue());
                 } else {
                     row.createCell(col++).setCellValue("");
                 }
 
-                setCellDate(row.createCell(col++), record.getResourceBirthDate(), dateStyle);
-                setCellLong(row.createCell(col++), record.getActiveDaysCount());
-                setCellLong(row.createCell(col++), record.getExpectedDays());
-                setCellDate(row.createCell(col++), record.getLoggedDate(), dateStyle);
-                row.createCell(col++).setCellValue(nullSafe(record.getCloudPlatform()));
+                setCellDate(row.createCell(col++), opportunityRawData.getResourceBirthDate(), dateStyle);
+                setCellLong(row.createCell(col++), opportunityRawData.getActiveDaysCount());
+                setCellLong(row.createCell(col++), opportunityRawData.getExpectedDays());
+                setCellDate(row.createCell(col++), opportunityRawData.getLoggedDate(), dateStyle);
+                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getCloudPlatform()));
             }
 
             // Auto-size columns

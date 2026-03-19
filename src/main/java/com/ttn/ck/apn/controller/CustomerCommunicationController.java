@@ -1,12 +1,13 @@
 package com.ttn.ck.apn.controller;
 
 import com.ttn.ck.apn.dto.CustomerCommunicationRequest;
+import com.ttn.ck.apn.dto.SuccessResponseDto;
 import com.ttn.ck.apn.model.CustomerData;
 import com.ttn.ck.apn.service.CustomerCommunicationService;
-import com.ttn.ck.core.response.SuccessResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.List;
  */
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("/customer-communication")
 @RequiredArgsConstructor

@@ -1,10 +1,9 @@
 package com.ttn.ck.apn.service.impl;
 
 import com.ttn.ck.apn.dao.CustomerCommunicationDataDao;
+import com.ttn.ck.apn.errorhandler.GenericStatusException;
 import com.ttn.ck.apn.model.CustomerData;
 import com.ttn.ck.apn.service.CustomerCommunicationService;
-import com.ttn.ck.authX.service.AuthorizedUserService;
-import com.ttn.ck.errorhandler.exceptions.GenericStatusException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,6 @@ import java.util.List;
 /**
  * Business logic implementation for Customer Communication operations.
  *
- * <p>Uses {@link AuthorizedUserService} to scope all operations to the
  * current user's partner, ensuring data isolation between partners.</p>
  */
 @Slf4j
@@ -23,12 +21,11 @@ import java.util.List;
 @AllArgsConstructor
 public class CustomerCommunicationServiceImpl implements CustomerCommunicationService {
 
-    private final AuthorizedUserService authorizedUserService;
     private final CustomerCommunicationDataDao dao;
 
     @Override
     public List<CustomerData> getAllCustomers() {
-        String partnerName = authorizedUserService.getPartnerName();
+        String partnerName = "CK AZ";
         log.info("Fetching all customer communication records for partner: {}", partnerName);
         List<CustomerData> customers = dao.findAll(partnerName);
         log.info("Found {} customer communication records", customers.size());
@@ -37,7 +34,7 @@ public class CustomerCommunicationServiceImpl implements CustomerCommunicationSe
 
     @Override
     public void addCustomer(CustomerData data) {
-        String partnerName = authorizedUserService.getPartnerName();
+        String partnerName = "CK AZ";
         data.setPartnerName(partnerName);
         log.info("Adding new customer: {} for partner: {}", data.getCustomerName(), partnerName);
         
@@ -55,9 +52,9 @@ public class CustomerCommunicationServiceImpl implements CustomerCommunicationSe
 
     @Override
     public void updateCustomer(CustomerData data) {
-        String partnerName = authorizedUserService.getPartnerName();
+        String partnerName = "CK AZ";
         data.setPartnerName(partnerName);
-        log.info("Updating customer: {} for partner: {}", data.getUuid(), authorizedUserService.getPartnerName());
+        log.info("Updating customer: {} for partner: {}", data.getUuid(), "CK AZ");
 
         CustomerData existing = dao.findCustomerByUuid(data.getUuid());
         if (existing == null) {
@@ -73,7 +70,7 @@ public class CustomerCommunicationServiceImpl implements CustomerCommunicationSe
 
     @Override
     public void deleteCustomer(String uuid) {
-        String partnerName = authorizedUserService.getPartnerName();
+        String partnerName = "CK AZ";
         log.info("Deleting customer: {} for partner: {}", uuid, partnerName);
         int rows = dao.deleteCustomer(uuid);
         if (rows == 0) {

@@ -21,6 +21,10 @@ spring:
 
   # ── Spring AI – OpenAI ─────────────────────────────────────────────────
   ai:
+    retry:
+      max-attempts: 3
+      backoff:
+        initial-interval: 1000
     openai:
       api-key: ${OPENAI_API_KEY:your-api-key}
       chat:
@@ -38,10 +42,9 @@ spring:
       simple:
         retry:
           enabled: true
-          initial-interval: 1000
+          initial-interval: 90000
           max-attempts: 3
-          max-interval: 10000
-          multiplier: 2.0
+          multiplier: 1.5
 
   # ── Disable auto-config for services not yet in use ────────────────────
   autoconfigure:
