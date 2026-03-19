@@ -16,9 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Primary business logic implementation for APN Opportunity operations.
@@ -49,7 +48,7 @@ public class ApnOpportunityDataServiceImpl implements ApnOpportunityDataService 
                 request.getStartDate(), request.getEndDate(), request.getOpportunityRaised());
         List<ApnOpportunityMasterData> data = dao.findMasterDataByFilters(request.getStartDate(), request.getEndDate(), request.getOpportunityRaised());
         log.info("data {}", data.size());
-        return new ArrayList<>();
+        return data.stream().map(this::mapToOpportunityData).collect(java.util.stream.Collectors.toList());
     }
 
     /**
@@ -144,4 +143,37 @@ public class ApnOpportunityDataServiceImpl implements ApnOpportunityDataService 
                 .build();
     }
 
+    private OpportunityData mapToOpportunityData(ApnOpportunityMasterData masterData) {
+        return OpportunityData.builder()
+                .lineitemUuid(masterData.getLineitemUuid())
+                .customerName(masterData.getCustomerName())
+                .customerCompanyName(masterData.getCustomerCompanyName())
+                .industry(masterData.getIndustry())
+                .industryOther(masterData.getIndustryOther())
+                .country(masterData.getCountry())
+                .state(masterData.getState())
+                .postalCode(masterData.getPostalCode())
+                .website(masterData.getWebsite())
+                .partnerPrimaryNeedFromAws(masterData.getPartnerPrimaryNeedFromAws())
+                .partnerProjectTitle(masterData.getPartnerProjectTitle())
+                .customerBusinessProblem(masterData.getCustomerBusinessProblem())
+                .solutionOffered(masterData.getSolutionOffered())
+                .otherSolutionOffered(masterData.getOtherSolutionOffered())
+                .nextApplicableSteps(masterData.getNextApplicableSteps())
+                .useCase(masterData.getUseCase())
+                .estimatedMonthlyRevenue(masterData.getEstimatedMonthlyRevenue())
+                .targetCloseDate(Objects.nonNull(masterData.getTargetCloseDate()) ? masterData.getTargetCloseDate().toString() : null)
+                .opportunityType(masterData.getOpportunityType())
+                .deliveryModel(masterData.getDeliveryModel())
+                .isOpportunityFromMarketing(masterData.getIsOpportunityFromMarketing())
+                .salesActivity(masterData.getSalesActivity())
+                .accountId(masterData.getLineitemUsageaccountid())
+                .primarySalesContactFirstName(masterData.getPrimarySalesContactFirstName())
+                .primarySalesContactLastName(masterData.getPrimarySalesContactLastName())
+                .primarySalesContactPhone(masterData.getPrimarySalesContactPhone())
+                .primarySalesContactEmail(masterData.getPrimarySalesContactEmail())
+                .primarySalesContactDesignation(masterData.getPrimarySalesContactDesignation())
+                .loggedDate(Objects.nonNull(masterData.getCreatedDate()) ? masterData.getCreatedDate().toString() : null)
+                .build();
+    }
 }
