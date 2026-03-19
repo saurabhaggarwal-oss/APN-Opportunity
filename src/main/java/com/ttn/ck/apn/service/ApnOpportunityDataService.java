@@ -57,5 +57,5 @@ public interface ApnOpportunityDataService {
      * Trigger asynchronous refresh by publishing to RabbitMQ.
      * Reads raw data UUIDs and sends them to the processing queue.
      */
-    void triggerRefresh();
+    void triggerRefresh(String triggeredAt, String partnerName);
 }

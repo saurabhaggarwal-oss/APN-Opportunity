@@ -129,18 +129,17 @@ public class ApnOpportunityDataServiceImpl implements ApnOpportunityDataService 
      * consumer, enabling parallel and retryable processing.
      */
     @Override
-    public void triggerRefresh() {
+    public void triggerRefresh(String triggeredAt, String partnerName) {
         log.info("Triggering opportunity refresh job");
-        String partnerName = "CK AZ";
-        RefreshMessage message = getRefreshMessage(partnerName);
+        RefreshMessage message = getRefreshMessage(triggeredAt, partnerName);
         refreshProducer.sendRefreshMessage(message);
         log.info("All refresh messages published successfully");
     }
 
-    private RefreshMessage getRefreshMessage(String partnerName) {
+    private RefreshMessage getRefreshMessage(String triggeredAt, String partnerName) {
         return RefreshMessage
                 .builder()
-                .triggeredAt(new Date())
+                .triggeredAt(triggeredAt)
                 .partnerName(partnerName)
                 .build();
     }

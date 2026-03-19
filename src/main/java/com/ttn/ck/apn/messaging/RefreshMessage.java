@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * Message POJO sent through RabbitMQ for the opportunity refresh flow.
@@ -22,7 +21,7 @@ public class RefreshMessage implements Serializable {
     /**
      * Timestamp when the refresh was triggered.
      */
-    private Date triggeredAt;
+    private String triggeredAt;
 
     /**
      * partner name for which refresh was triggered.

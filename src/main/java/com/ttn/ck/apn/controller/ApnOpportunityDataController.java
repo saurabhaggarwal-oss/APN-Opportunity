@@ -40,9 +40,9 @@ public class ApnOpportunityDataController {
      * <p>Example:
      * {@code GET /apn-opportunities/master?startDate=2026-01-01&endDate=2026-03-12&opportunityRaised=true}
      *
-     * @param startDate          start of date range (yyyy-MM-dd)
-     * @param endDate            end of date range (yyyy-MM-dd)
-     * @param opportunityRaised  filter by raised status
+     * @param startDate         start of date range (yyyy-MM-dd)
+     * @param endDate           end of date range (yyyy-MM-dd)
+     * @param opportunityRaised filter by raised status
      * @return list of matching master data records
      */
     @GetMapping("/master")
@@ -165,9 +165,9 @@ public class ApnOpportunityDataController {
      * @return acknowledgment response
      */
     @PostMapping("/refresh")
-    public SuccessResponseDto<Boolean> triggerRefresh() {
+    public SuccessResponseDto<Boolean> triggerRefresh(@RequestParam String triggeredAt, @RequestParam String partnerName) {
         log.info("POST /refresh — triggering async refresh");
-        service.triggerRefresh();
+        service.triggerRefresh(triggeredAt, partnerName);
         return new SuccessResponseDto<>(Boolean.TRUE);
     }
 }
