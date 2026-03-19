@@ -1,4 +1,4 @@
-package com.ttn.ck.apn.errorhandler;
+package com.ttn.ck.errorhandler.exceptions;
 
 import lombok.Getter;
 

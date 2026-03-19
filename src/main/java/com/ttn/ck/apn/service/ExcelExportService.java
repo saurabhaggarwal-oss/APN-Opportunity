@@ -1,8 +1,8 @@
 package com.ttn.ck.apn.service;
 
-import com.ttn.ck.apn.errorhandler.GenericStatusException;
 import com.ttn.ck.apn.model.ApnOpportunityMasterData;
 import com.ttn.ck.apn.model.ApnOpportunityRawData;
+import com.ttn.ck.errorhandler.exceptions.GenericStatusException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -35,14 +35,14 @@ public class ExcelExportService {
         log.info("Generating master data Excel for {} records", records.size());
 
         String[] headers = {
-                "UUID", "Customer Name", "Customer Company Name", "Industry",
+                "Customer Name", "Customer Company Name", "Industry",
                 "Country", "State", "Partner Project Title",
                 "Customer Business Problem", "Solution Offered",
                 "Use Case", "Estimated Monthly Revenue", "Target Close Date",
                 "Opportunity Type", "Delivery Model", "Sales Activity",
                 "Account ID", "Opportunity Raised", "Opportunity Raised Date",
                 "Opportunity Raised By", "Cloud Platform", "Partner Name",
-                "Logged Date", "Created Date", "Modified Date"
+                "Logged Date"
         };
 
         try (Workbook workbook = new XSSFWorkbook()) {
@@ -64,7 +64,6 @@ public class ExcelExportService {
                 Row row = sheet.createRow(rowIdx + 1);
 
                 int col = 0;
-                row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getLineitemUuid()));
                 row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getCustomerName()));
                 row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getCustomerCompanyName()));
                 row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getIndustry()));
@@ -86,9 +85,6 @@ public class ExcelExportService {
                 row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getOpportunityRaisedBy()));
                 row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getCloudPlatform()));
                 row.createCell(col++).setCellValue(nullSafe(opportunityMasterData.getPartnerName()));
-                setCellDate(row.createCell(col++), opportunityMasterData.getLoggedDate(), dateStyle);
-                setCellDate(row.createCell(col++), opportunityMasterData.getCreatedDate(), dateStyle);
-                setCellDate(row.createCell(col++), opportunityMasterData.getModifiedDate(), dateStyle);
             }
 
             // Auto-size columns for readability
@@ -114,10 +110,10 @@ public class ExcelExportService {
         log.info("Generating raw data Excel for {} records", records.size());
 
         String[] headers = {
-                "UUID", "Customer Name", "Account ID", "Service Name",
+                "Customer Name", "Account ID", "Service Name",
                 "Region", "Operating System", "Resource ID",
                 "Instance Type", "Product Code", "Name Tag",
-                "Autoscaling Name", "Key", "Workload Title",
+                "Autoscaling Name", "Workload Title",
                 "Workload Description", "Total Period Cost",
                 "Resource Birth Date", "Active Days", "Expected Days",
                 "Logged Date", "Cloud Platform"
@@ -153,7 +149,6 @@ public class ExcelExportService {
                 row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getProductcode()));
                 row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getFinalNameTag()));
                 row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getFinalAutoscalingName()));
-                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getKey()));
                 row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getWorkloadTitle()));
                 row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getWorkloadDescription()));
 
@@ -168,7 +163,6 @@ public class ExcelExportService {
                 setCellLong(row.createCell(col++), opportunityRawData.getActiveDaysCount());
                 setCellLong(row.createCell(col++), opportunityRawData.getExpectedDays());
                 setCellDate(row.createCell(col++), opportunityRawData.getLoggedDate(), dateStyle);
-                row.createCell(col++).setCellValue(nullSafe(opportunityRawData.getCloudPlatform()));
             }
 
             // Auto-size columns
@@ -215,7 +209,7 @@ public class ExcelExportService {
         return value != null ? value : "";
     }
 
-    private void setCellDate(Cell cell, Date date, CellStyle dateStyle) {
+    private void setCellDate(Cell cell, LocalDateTime date, CellStyle dateStyle) {
         if (date != null) {
             cell.setCellValue(date);
             cell.setCellStyle(dateStyle);

@@ -30,6 +30,9 @@ public class CustomerCommunicationRequest {
     @NotBlank(message = "Customer name is required")
     private String customerName;
 
+    @NotBlank(message = "Partner name is required")
+    private String partnerName;
+
     @NotBlank(message = "Customer company name is required")
     private String customerCompanyName;
 

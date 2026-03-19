@@ -15,7 +15,7 @@ public interface CustomerCommunicationService {
      *
      * @return list of customer data records
      */
-    List<CustomerData> getAllCustomers();
+    List<CustomerData> getAllCustomers(String partnerName);
 
     /**
      * Add a new customer communication record.

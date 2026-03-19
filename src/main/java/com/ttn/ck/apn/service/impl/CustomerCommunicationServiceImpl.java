@@ -1,9 +1,9 @@
 package com.ttn.ck.apn.service.impl;
 
 import com.ttn.ck.apn.dao.CustomerCommunicationDataDao;
-import com.ttn.ck.apn.errorhandler.GenericStatusException;
 import com.ttn.ck.apn.model.CustomerData;
 import com.ttn.ck.apn.service.CustomerCommunicationService;
+import com.ttn.ck.errorhandler.exceptions.GenericStatusException;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,6 @@ import java.util.List;
 
 /**
  * Business logic implementation for Customer Communication operations.
- *
  * current user's partner, ensuring data isolation between partners.</p>
  */
 @Slf4j
@@ -24,8 +23,7 @@ public class CustomerCommunicationServiceImpl implements CustomerCommunicationSe
     private final CustomerCommunicationDataDao dao;
 
     @Override
-    public List<CustomerData> getAllCustomers() {
-        String partnerName = "CK AZ";
+    public List<CustomerData> getAllCustomers(String partnerName) {
         log.info("Fetching all customer communication records for partner: {}", partnerName);
         List<CustomerData> customers = dao.findAll(partnerName);
         log.info("Found {} customer communication records", customers.size());
@@ -34,15 +32,12 @@ public class CustomerCommunicationServiceImpl implements CustomerCommunicationSe
 
     @Override
     public void addCustomer(CustomerData data) {
-        String partnerName = "CK AZ";
-        data.setPartnerName(partnerName);
-        log.info("Adding new customer: {} for partner: {}", data.getCustomerName(), partnerName);
-        
-        CustomerData existing = dao.findCustomerByUuid(data.getUuid());
+        log.info("Adding new customer: {} ", data);
+        CustomerData existing = dao.findCustomerByNameAndPartner(data.getCustomerName(), data.getPartnerName());
         if (existing != null) {
             throw new GenericStatusException("Customer with this name already exists", HttpStatus.BAD_REQUEST.value());
         }
-        
+
         int rows = dao.addCustomer(data);
         if (rows == 0) {
             throw new GenericStatusException("Failed to add customer record", HttpStatus.BAD_REQUEST.value());
@@ -52,15 +47,13 @@ public class CustomerCommunicationServiceImpl implements CustomerCommunicationSe
 
     @Override
     public void updateCustomer(CustomerData data) {
-        String partnerName = "CK AZ";
-        data.setPartnerName(partnerName);
-        log.info("Updating customer: {} for partner: {}", data.getUuid(), "CK AZ");
 
+        log.info("Updating customer uuid: {}", data.getUuid());
         CustomerData existing = dao.findCustomerByUuid(data.getUuid());
         if (existing == null) {
             throw new GenericStatusException("No customer record found with name: " + data.getCustomerName(), HttpStatus.BAD_REQUEST.value());
         }
-        
+
         int rows = dao.updateCustomer(data);
         if (rows == 0) {
             throw new GenericStatusException("Failed to update customer record", HttpStatus.BAD_REQUEST.value());
@@ -70,8 +63,7 @@ public class CustomerCommunicationServiceImpl implements CustomerCommunicationSe
 
     @Override
     public void deleteCustomer(String uuid) {
-        String partnerName = "CK AZ";
-        log.info("Deleting customer: {} for partner: {}", uuid, partnerName);
+        log.info("Deleting customer: for uuid {}", uuid);
         int rows = dao.deleteCustomer(uuid);
         if (rows == 0) {
             throw new GenericStatusException("No customer record found with name: " + uuid, HttpStatus.BAD_REQUEST.value());

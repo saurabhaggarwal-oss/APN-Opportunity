@@ -1,93 +1,103 @@
+buildscript {
+    ext {
+        springBootVersion = '4.0.3'
+        springAiVersion = '2.0.0-M3'
+    }
+
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '4.0.3'
-	id 'io.spring.dependency-management' version '1.1.7'
+    id 'java'
+    id 'idea'
+    id 'java-library'
+    id 'org.springframework.boot' version '4.0.3'
+    id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'com.ttn.ck'
 version = '0.0.1-SNAPSHOT'
-description = 'Demo project for Spring Boot'
+description = 'Apn opportunity project'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(17)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenLocal()
-	def nexusRepoUrl = 'http://nexus.ck.tothenew.net/repository/CloudKeeper_prod/'
-
-	if (nexusRepoUrl) {
-		maven {
-			name = "Cloudkeeper"
-			url = uri(nexusRepoUrl)
-			allowInsecureProtocol = true
-		}
-	}
-	mavenCentral()
-
-	maven {
-		url "http://redshift-maven-repository.s3-website-us-east-1.amazonaws.com/release"
-		allowInsecureProtocol = true
-	}
-}
-
-ext {
-	set('springAiVersion', "2.0.0-M2")
+    mavenCentral()
 }
 
 dependencies {
-
-	implementation('com.ttn.ck:core:1.0.15')
-	implementation('com.ttn.ck:dtos:1.0.55')
-	implementation('com.ttn.ck:errorhandler:1.0.0')
-	implementation('com.ttn.ck:authX:1.0.3')
-	implementation('com.ttn.ck:snowplug:1.0.8')
-	implementation('com.ttn.ck:queryprocessor:1.0.5')
-	implementation('com.ttn.ck:mqpublisher:1.0.0')
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-	implementation 'org.springframework.boot:spring-boot-starter-amqp'
-	implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
-	implementation 'org.springframework.ai:spring-ai-starter-model-openai'
-
-	// Snowflake JDBC driver
-	implementation 'net.snowflake:snowflake-jdbc:3.16.1'
-
-	// Apache POI for Excel generation
-	implementation 'org.apache.poi:poi-ooxml:5.2.5'
-
-	// Jackson for JSON serialization in RabbitMQ messages
-	implementation 'com.fasterxml.jackson.core:jackson-databind'
-
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
-	testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    api project(":snowplug")
+    api project(":errorhandler")
+    api project(":queryprocessor")
 }
 
-dependencyManagement {
-	imports {
-		mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
-	}
-}
+allprojects {
 
-tasks.named('test') {
-	useJUnitPlatform()
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'java-library'
+    apply plugin: 'maven-publish'
+
+    dependencyManagement {
+        imports {
+            mavenBom("org.springframework.boot:spring-boot-dependencies:${springBootVersion}")
+        }
+    }
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+        implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+        implementation 'org.springframework.boot:spring-boot-starter-validation'
+        implementation 'org.springframework.boot:spring-boot-starter-jdbc'
+        implementation 'org.springframework.boot:spring-boot-starter-amqp'
+        //implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
+        implementation 'org.springframework.ai:spring-ai-starter-model-openai'
+        implementation 'org.springframework.retry:spring-retry:2.0.5'
+
+        // Snowflake JDBC driver
+        implementation 'net.snowflake:snowflake-jdbc:3.16.1'
+
+        // Apache POI for Excel generation
+        implementation 'org.apache.poi:poi-ooxml:5.2.5'
+
+        // Jackson for JSON serialization in RabbitMQ messages
+        implementation 'com.fasterxml.jackson.core:jackson-databind'
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
+        testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.ai:spring-ai-bom:${springAiVersion}"
+        }
+    }
 }
 
 jar {
-	manifest {
-		attributes('Class-Path': configurations.collect { it.getName() }.join(' '), 'Main-Class': 'com.ttn.ck.apn.ApnOpportunityApplication')
-	}
+    manifest {
+        attributes('Class-Path': configurations.collect { it.getName() }.join(' '), 'Main-Class': 'com.ttn.ck.apn.ApnOpportunityApplication')
+    }
 }

@@ -9,7 +9,8 @@ import com.ttn.ck.apn.model.WorkloadEvent;
 import com.ttn.ck.apn.model.WorkloadResponseDTO;
 import com.ttn.ck.apn.service.WorkloadEventProducer;
 import com.ttn.ck.apn.service.WorkloadGenerationService;
-import lombok.AllArgsConstructor;
+import com.ttn.ck.apn.utils.ResourceLoaderService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;
@@ -18,15 +19,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.ttn.ck.apn.utils.ApnUtils.BATCH_SIZE;
+
 @Slf4j
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class WorkloadGenerationServiceImpl implements WorkloadGenerationService {
 
-    private static final int BATCH_SIZE = 10;
-
     private final ChatClient chatClient;
-    private final String promptTemplate;
+    private final ResourceLoaderService resourceLoaderService;
     private final ApnOpportunityDataDao apnOpportunityDataDao;
     private final WorkloadEventProducer workloadEventProducer;
     private final ObjectMapper objectMapper;
@@ -72,7 +73,7 @@ public class WorkloadGenerationServiceImpl implements WorkloadGenerationService 
 
         try {
             String inputTable = formatRawDataAsTable(batch);
-            String fullPrompt = promptTemplate + "\n\n" + inputTable;
+            String fullPrompt = resourceLoaderService.loadFile("prompts/workload-generation-prompt.st")+ "\n\n" + inputTable;
             Object responseObj = chatClient.prompt()
                     .user(fullPrompt)
                     .call()

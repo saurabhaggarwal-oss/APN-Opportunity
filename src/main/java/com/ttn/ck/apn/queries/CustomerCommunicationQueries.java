@@ -29,4 +29,7 @@ public class CustomerCommunicationQueries {
     @Value("${customer.communication.getByUuid}")
     String byUuid;
 
+    @Value("${customer.communication.customer.name.and.partner.name}")
+    String byCustomerNameAndPartner;
+
 }

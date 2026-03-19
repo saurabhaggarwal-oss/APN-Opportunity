@@ -42,9 +42,9 @@ public class CustomerCommunicationController {
      * @return list of all customer data records
      */
     @GetMapping("/getAll")
-    public SuccessResponseDto<List<CustomerData>> getAllCustomers() {
+    public SuccessResponseDto<List<CustomerData>> getAllCustomers(@RequestParam String partnerName) {
         log.info("GET /customer-communication/getAll");
-        return new SuccessResponseDto<>(service.getAllCustomers());
+        return new SuccessResponseDto<>(service.getAllCustomers(partnerName));
     }
 
     /**
@@ -132,6 +132,7 @@ public class CustomerCommunicationController {
                 .state(request.getState())
                 .postalCode(request.getPostalCode())
                 .website(request.getWebsite())
+                .partnerName(request.getPartnerName())
                 .build();
     }
 }

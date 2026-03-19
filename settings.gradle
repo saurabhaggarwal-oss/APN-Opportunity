@@ -1,1 +1,5 @@
 rootProject.name = 'apn'
+
+include 'queryprocessor'
+include 'snowplug'
+include 'errorhandler'

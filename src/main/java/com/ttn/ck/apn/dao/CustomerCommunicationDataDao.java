@@ -50,4 +50,13 @@ public interface CustomerCommunicationDataDao {
      * @return a single customer data record, or null if not found
      */
     CustomerData findCustomerByUuid(String uuid);
+
+    /**
+     * Fetch a customer communication record by customerName and partnerName.
+     *
+     * @param customerName the customer's name
+     * @param partnerName the customer partner name
+     * @return a single customer data record, or null if not found
+     */
+    CustomerData findCustomerByNameAndPartner(String customerName, String partnerName);
 }

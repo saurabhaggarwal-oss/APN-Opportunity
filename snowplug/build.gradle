@@ -1,0 +1,21 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.ttn.ck'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    api project(':queryprocessor')
+    implementation 'net.snowflake:snowflake-jdbc:3.13.27'
+    implementation 'net.snowflake:snowflake-common:5.1.4'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+}
+
+test {
+    useJUnitPlatform()
+}

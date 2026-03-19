@@ -3,7 +3,6 @@ package com.ttn.ck.apn.controller;
 import com.ttn.ck.apn.dto.*;
 import com.ttn.ck.apn.model.ApnOpportunityRawData;
 import com.ttn.ck.apn.service.ApnOpportunityDataService;
-import com.ttn.ck.core.response.SuccessResponseDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
