@@ -5,18 +5,26 @@ spring:
   # ── Snowflake Datasource ────────────────────────────────────────────────
   # Replace placeholders with actual Snowflake credentials
   datasource:
-    url: jdbc:snowflake://<ACCOUNT>.snowflakecomputing.com/?db=<DATABASE>&schema=<SCHEMA>&warehouse=<WAREHOUSE>
-    username: ${SNOWFLAKE_USERNAME:your-username}
-    password: ${SNOWFLAKE_PASSWORD:your-password}
+    url: ${SNOWFLAKE_DATABASE_URL:}
+    name: ${SNOWFLAKE_DATABASE_NAME:}
+    warehouse: ${SNOWFLAKE_WAREHOUSE:}
+    schema: ${SNOWFLAKE_SCHEMA:}
+    role: ${SNOWFLAKE_ROLE:}
+    username: ${SNOWFLAKE_USERNAME:}
+    password: ${SNOWFLAKE_PASSWORD:}
     driver-class-name: net.snowflake.client.jdbc.SnowflakeDriver
+    dialect: com.ttn.ck.datasourceconfig.SnowflakeDialect
+    caseSensitivity: false
+    maxActive: ${SNOWFLAKE_MAX_CONNECTION:50}
 
   # ── JPA / Hibernate ────────────────────────────────────────────────────
   jpa:
     hibernate:
       ddl-auto: none
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
+        dialect: com.ttn.ck.apn.utils.SnowflakeDialect
         format_sql: true
 
   # ── Spring AI – OpenAI ─────────────────────────────────────────────────
@@ -26,7 +34,7 @@ spring:
       backoff:
         initial-interval: 1000
     openai:
-      api-key: ${OPENAI_API_KEY:your-api-key}
+      api-key: ${OPENAI_API_KEY:}
       chat:
         options:
           model: gpt-4o
