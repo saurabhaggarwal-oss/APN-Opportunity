@@ -1,5 +1,6 @@
 package com.ttn.ck.apn.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.ttn.ck.apn.dao.ApnOpportunityDataDao;
 import com.ttn.ck.apn.dto.MasterDataFilterRequest;
 import com.ttn.ck.apn.dto.OpportunityData;
@@ -48,7 +49,7 @@ public class ApnOpportunityDataServiceImpl implements ApnOpportunityDataService 
                 request.getStartDate(), request.getEndDate(), request.getOpportunityRaised());
         List<ApnOpportunityMasterData> data = dao.findMasterDataByFilters(request.getStartDate(), request.getEndDate(), request.getOpportunityRaised());
         log.info("data {}", data.size());
-        return data.stream().map(this::mapToOpportunityData).collect(java.util.stream.Collectors.toList());
+        return data.stream().map(this::mapToOpportunityData).toList();
     }
 
     /**
@@ -130,9 +131,13 @@ public class ApnOpportunityDataServiceImpl implements ApnOpportunityDataService 
     @Override
     public void triggerRefresh(String triggeredAt, String partnerName) {
         log.info("Triggering opportunity refresh job");
-        RefreshMessage message = getRefreshMessage(triggeredAt, partnerName);
-        refreshProducer.sendRefreshMessage(message);
-        log.info("All refresh messages published successfully");
+        try {
+            RefreshMessage message = getRefreshMessage(triggeredAt, partnerName);
+            refreshProducer.sendRefreshMessage(message);
+            log.info("All refresh messages published successfully");
+        } catch (JsonProcessingException e) {
+            log.error("error while publishing message", e);
+        }
     }
 
     private RefreshMessage getRefreshMessage(String triggeredAt, String partnerName) {

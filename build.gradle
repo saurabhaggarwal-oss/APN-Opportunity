@@ -50,6 +50,10 @@ dependencies {
     api project(":queryprocessor")
 }
 
+bootJar {
+    enabled = true
+}
+
 allprojects {
 
     apply plugin: 'java'

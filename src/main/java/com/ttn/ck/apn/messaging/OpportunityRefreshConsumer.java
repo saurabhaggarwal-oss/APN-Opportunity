@@ -1,6 +1,10 @@
 package com.ttn.ck.apn.messaging;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ttn.ck.apn.service.WorkloadGenerationService;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Component;
@@ -23,13 +27,11 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@AllArgsConstructor
 public class OpportunityRefreshConsumer {
 
+    private final ObjectMapper mapper;
     private final WorkloadGenerationService workloadGenerationService;
-
-    public OpportunityRefreshConsumer(WorkloadGenerationService workloadGenerationService) {
-        this.workloadGenerationService = workloadGenerationService;
-    }
 
     /**
      * Processes a single refresh message from the queue.
@@ -44,7 +46,7 @@ public class OpportunityRefreshConsumer {
      * @param message the refresh message containing the UUID to process
      */
     @RabbitListener(queues = "${app.rabbitmq.queue.opportunity-refresh}")
-    public void handleRefreshMessage(RefreshMessage message) {
-        workloadGenerationService.processUnprocessedWorkloads(message);
+    public void handleRefreshMessage(String message) throws JsonProcessingException {
+        workloadGenerationService.processUnprocessedWorkloads(mapper.readValue(message, new TypeReference<>() {}));
     }
 }

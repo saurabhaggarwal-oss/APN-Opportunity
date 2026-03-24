@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 /**
  * Message POJO sent through RabbitMQ for the opportunity refresh flow.
  * <p>Serialized as JSON via Jackson (configured in {@link RabbitMQConfig}).</p>
@@ -16,7 +14,7 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class RefreshMessage implements Serializable {
+public class RefreshMessage {
 
     /**
      * Timestamp when the refresh was triggered.
