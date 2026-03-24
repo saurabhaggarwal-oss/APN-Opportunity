@@ -47,6 +47,7 @@ public class OpportunityRefreshConsumer {
      */
     @RabbitListener(queues = "${app.rabbitmq.queue.opportunity-refresh}")
     public void handleRefreshMessage(String message) throws JsonProcessingException {
+        log.info("Message received in APN Opportunity Refresh queue {}", message);
         workloadGenerationService.processUnprocessedWorkloads(mapper.readValue(message, new TypeReference<>() {}));
     }
 }

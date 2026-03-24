@@ -2,6 +2,7 @@ package com.ttn.ck.apn.dao;
 
 import com.ttn.ck.apn.model.ApnOpportunityMasterData;
 import com.ttn.ck.apn.model.ApnOpportunityRawData;
+import com.ttn.ck.apn.model.WorkloadResponseDTO;
 
 import java.util.List;
 import java.util.Set;
@@ -58,29 +59,27 @@ public interface ApnOpportunityDataDao {
 
     /**
      * Update the workload title and description for a specific raw data lineitem.
-     * 
-     * @param lineitemUuid the lineitem UUID
-     * @param workloadTitle the generated workload title
-     * @param workloadDescription the generated workload description
+     *
+     * @param workloadResponse the generated contains lineItemUuid, workload title, and workload description
      */
-    void updateWorkloadDetailsByLineItemUuid(String lineitemUuid, String workloadTitle, String workloadDescription);
+    void updateWorkloadDetailsByLineItemUuid(List<WorkloadResponseDTO> workloadResponse);
 
     /**
      * Insert into opportunity master table based on the processed event data.
      * 
      * @param customerName the customer name
-     * @param partnerName the partner name
+     * @param accountId the customer's accountId
      * @param workloadDescription the workload description as per requirement
      */
-    void insertOpportunityMasterData(String customerName, String partnerName, String workloadDescription);
+    void insertOpportunityMasterData(String customerName, String accountId, String workloadDescription);
 
     /**
      * Insert into opportunity mapping table based on the processed event data.
      * 
      * @param customerName the customer name
-     * @param partnerName the partner name
+     * @param accountId the customer's accountId
      * @param workloadDescription the workload description as per requirement
      */
-    void insertOpportunityMappingData(String customerName, String partnerName, String workloadDescription);
+    void insertOpportunityMappingData(String customerName, String accountId, String workloadDescription);
 
 }

@@ -1,5 +1,7 @@
 package com.ttn.ck.apn.service.impl;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ttn.ck.apn.dao.ApnOpportunityDataDao;
 import com.ttn.ck.apn.model.WorkloadEvent;
 import lombok.RequiredArgsConstructor;
@@ -14,30 +16,27 @@ import org.springframework.transaction.annotation.Transactional;
 public class WorkloadEventConsumer {
 
     private final ApnOpportunityDataDao apnOpportunityDataDao;
-    
-    // We fetch workload description from somewhere or utilize an existing standard one if the event only carries customName & partnerName.
-    // Based on the user requirements, 'WorkloadEvent' only has customerName and partnerName.
-    // Since we are creating a master entry, we will need the workloadDescription which presumably is fetched from RawData or stored elsewhere.
-    // For now we will assume the workload description passed here can safely be fetched or use a placeholder per the requirement to 'insert into master table'.
-    private static final String DEFAULT_WORKLOAD_DESCRIPTION = "System Generated Workload";
+    private final ObjectMapper objectMapper;
 
-    @RabbitListener(queues = "${app.rabbitmq.queue.opportunity-refresh}")
+    @RabbitListener(queues = "${app.rabbitmq.queue.master-data-refresh}", concurrency = "2")
     @Transactional
-    public void handleWorkloadEvent(WorkloadEvent event) {
+    public void handleWorkloadEvent(String message) {
+        log.info("Message Received in master data refresh queue {}", message);
+        WorkloadEvent event = objectMapper.convertValue(message, new TypeReference<>() {});
         log.info("Received WorkloadEvent for customer: {} partner: {}", event.getCustomerName(), event.getPartnerName());
 
         try {
             apnOpportunityDataDao.insertOpportunityMasterData(
-                    event.getCustomerName(), 
-                    event.getPartnerName(), 
-                    DEFAULT_WORKLOAD_DESCRIPTION
+                    event.getCustomerName(),
+                    event.getAccountId(),
+                    event.getWorkloadDescription()
             );
             log.debug("Master data insertion completed for customer: {}", event.getCustomerName());
 
             apnOpportunityDataDao.insertOpportunityMappingData(
                     event.getCustomerName(), 
-                    event.getPartnerName(), 
-                    DEFAULT_WORKLOAD_DESCRIPTION
+                    event.getAccountId(),
+                    event.getWorkloadDescription()
             );
             log.debug("Mapping data insertion completed for customer: {}", event.getCustomerName());
 

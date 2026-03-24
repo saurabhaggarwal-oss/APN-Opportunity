@@ -24,7 +24,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @author Amit Raturi
+ * @author Saurabh Aggarwal
  * Query Executor framework is based on Entity manager bean, and it provides utilty functions/methods to fetch data and map data to respective DTO's.
  * Query Executor is used to process native queries, to process namedQueries , You can use original entities na repos to bind them.
  * This class is thread safe.

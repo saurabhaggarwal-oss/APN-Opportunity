@@ -23,14 +23,21 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    @Value("${app.rabbitmq.queue.opportunity-refresh}")
-    private String queueName;
-
     @Value("${app.rabbitmq.exchange.opportunity}")
     private String exchangeName;
 
+    @Value("${app.rabbitmq.queue.opportunity-refresh}")
+    private String queueName;
+
     @Value("${app.rabbitmq.routing-key.opportunity-refresh}")
     private String routingKey;
+
+    @Value("${app.rabbitmq.queue.master-data-refresh}")
+    private String masterDataQueue;
+
+
+    @Value("${app.rabbitmq.routing-key.master-refresh}")
+    private String masterRefreshKey;
 
     // ── Dead Letter Queue ────────────────────────────────────────────────
 
@@ -81,6 +88,21 @@ public class RabbitMQConfig {
                 .bind(opportunityRefreshQueue())
                 .to(opportunityExchange())
                 .with(routingKey);
+    }
+    @Bean
+    public Queue masterDataRefreshQueue() {
+        return QueueBuilder.durable(masterDataQueue)
+                .withArgument("x-dead-letter-exchange", exchangeName + ".dlx")
+                .withArgument("x-dead-letter-routing-key", routingKey + ".dlq")
+                .build();
+    }
+
+    @Bean
+    public Binding masterDataRefreshBinding() {
+        return BindingBuilder
+                .bind(masterDataRefreshQueue())
+                .to(opportunityExchange())
+                .with(masterRefreshKey);
     }
 
 }

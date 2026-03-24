@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * @author Amit Raturi
+ * @author Saurabh Aggarwal
  * Query Executor framework is based on Entity manager bean, and it provides utilty functions/methods to fetch data and map data to respective DTO's.
  * Query Executor is used to process native queries, to process namedQueries , You can use original entities na repos to bind them.
  * This class is thread safe.
@@ -27,9 +27,9 @@ public class PersistenceQueryExecutor {
 
     /***
      * This method will be used to insert record in DB
-     * @param qString
-     * @param params
-     * @return
+     * @param qString the query sent from calling
+     * @param params the dynamic parameters
+     * @return the number of records updated
      */
     public static int save(String qString, Map<String, Object> params) {
         Query query = getQuery(qString, params);
@@ -57,15 +57,14 @@ public class PersistenceQueryExecutor {
 
     private static int executeUpdate(Query query) {
         Transaction transaction = createSessionAndBeginTransaction();
-        int result =  query.executeUpdate();
-        transaction.commit();;
-        return  result;
+        int result = query.executeUpdate();
+        transaction.commit();
+        return result;
     }
 
     private static Transaction createSessionAndBeginTransaction() {
         Session session = queryManager.getSession();
-        Transaction transaction = session.beginTransaction();
-        return transaction;
+        return session.beginTransaction();
     }
 
     /**
@@ -73,8 +72,8 @@ public class PersistenceQueryExecutor {
      * The List of Map received in request body, should contain values to be stored in DB.
      * The map key will be the sequence of values as used in query starting with 1.
      *
-     * @param qString
-     * @param params
+     * @param qString the query sent from the calling method
+     * @param params  the parameter with their respective index
      */
     public static void saveAll(String qString, List<Map<Integer, Object>> params) {
         init();
@@ -83,8 +82,8 @@ public class PersistenceQueryExecutor {
             try (PreparedStatement preparedStatement = connection.prepareStatement(qString)) {
                 int i = 1;
                 for (Map<Integer, Object> objMap : params) {
-                    for (Integer index : objMap.keySet()) {
-                        preparedStatement.setObject(index, objMap.get(index));
+                    for (Map.Entry<Integer, Object> entry : objMap.entrySet()) {
+                        preparedStatement.setObject(entry.getKey(), entry.getValue());
                     }
                     preparedStatement.addBatch();
                     if (i % 20 == 0) {
@@ -94,7 +93,7 @@ public class PersistenceQueryExecutor {
                 }
                 preparedStatement.executeBatch();
             } catch (SQLException e) {
-                log.error("An exception occurred in SampleNativeQueryRepository.bulkInsertName: {}", e);
+                log.error("An exception occurred in SampleNativeQueryRepository.bulkInsertName: ", e);
             }
         });
     }

@@ -3,6 +3,7 @@ package com.ttn.ck.apn.dao.impl;
 import com.ttn.ck.apn.dao.ApnOpportunityDataDao;
 import com.ttn.ck.apn.model.ApnOpportunityMasterData;
 import com.ttn.ck.apn.model.ApnOpportunityRawData;
+import com.ttn.ck.apn.model.WorkloadResponseDTO;
 import com.ttn.ck.apn.queries.ApnOpportunityQueries;
 import com.ttn.ck.apn.utils.ApnUtils;
 import com.ttn.ck.queryprocessor.service.PersistenceQueryExecutor;
@@ -76,32 +77,38 @@ public class ApnOpportunityDataDaoImpl implements ApnOpportunityDataDao {
     }
 
     @Override
-    public void updateWorkloadDetailsByLineItemUuid(String lineitemUuid, String workloadTitle, String workloadDescription) {
-        log.info("Updating workload details for lineitem UUID: {}", lineitemUuid);
-        Map<String, Object> param = new HashMap<>();
-        param.put(LINEITEM_UUID, lineitemUuid);
-        param.put(WORKLOAD_TITLE, workloadTitle);
-        param.put(WORKLOAD_DESCRIPTION, workloadDescription);
-        int records = PersistenceQueryExecutor.save(opportunityQueries.getUpdateOpportunityRawDataByLineitemUuid(), param);
-        log.debug("{} opportunity raw data workload details updated", records);
+    public void updateWorkloadDetailsByLineItemUuid(List<WorkloadResponseDTO> workloadResponse) {
+        log.info("Updating workload details for batch: {}", workloadResponse);
+        List<Map<Integer, Object>> params = new ArrayList<>();
+        workloadResponse.forEach(workload-> {
+            Map<Integer, Object> map = new HashMap<>();
+            map.put(1, workload.getWorkloadTitle());
+            map.put(2, workload.getWorkloadDescription());
+            map.put(3, workload.getLineitemUuid());
+            params.add(map);
+        });
+
+        PersistenceQueryExecutor.saveAll(opportunityQueries.getUpdateOpportunityRawDataByLineitemUuid(), params);
+        log.debug("{} opportunity raw data workload details updated", workloadResponse.size());
     }
 
     @Override
-    public void insertOpportunityMasterData(String customerName, String partnerName, String workloadDescription) {
+    public void insertOpportunityMasterData(String customerName, String accountId, String workloadDescription) {
         log.info("Inserting opportunity master data for customer: {}", customerName);
         Map<String, Object> param = new HashMap<>();
         param.put(CUSTOMER_NAME, customerName);
+        param.put(ACCOUNT_ID, accountId);
         param.put(WORKLOAD_DESCRIPTION, workloadDescription);
         int records = PersistenceQueryExecutor.save(opportunityQueries.getInsertOpportunityMasterData(), param);
         log.debug("{} opportunity master data inserted", records);
     }
 
     @Override
-    public void insertOpportunityMappingData(String customerName, String partnerName, String workloadDescription) {
+    public void insertOpportunityMappingData(String customerName, String accountId, String workloadDescription) {
         log.info("Inserting opportunity mapping data for customer: {}", customerName);
         Map<String, Object> param = new HashMap<>();
         param.put(CUSTOMER_NAME, customerName);
-        param.put(ACCOUNT_ID, partnerName);
+        param.put(ACCOUNT_ID, accountId);
         param.put(WORKLOAD_DESCRIPTION, workloadDescription);
         int records = PersistenceQueryExecutor.save(opportunityQueries.getInsertOpportunityMappingData(), param);
         log.debug("{} opportunity mapping data inserted", records);

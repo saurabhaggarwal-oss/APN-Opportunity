@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-
 /**
  * Event model representing a processed workload ready for RabbitMQ.
  */
@@ -14,7 +12,11 @@ import java.io.Serializable;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class WorkloadEvent implements Serializable {
+public class WorkloadEvent {
+
     private String customerName;
     private String partnerName;
+    private String accountId;
+    private String workloadDescription;
+
 }

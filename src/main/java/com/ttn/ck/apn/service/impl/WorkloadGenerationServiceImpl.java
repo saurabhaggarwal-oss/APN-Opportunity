@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ttn.ck.apn.dao.ApnOpportunityDataDao;
 import com.ttn.ck.apn.messaging.RefreshMessage;
 import com.ttn.ck.apn.model.ApnOpportunityRawData;
+import com.ttn.ck.apn.model.OpenAiResponseDTO;
 import com.ttn.ck.apn.model.WorkloadEvent;
 import com.ttn.ck.apn.model.WorkloadResponseDTO;
 import com.ttn.ck.apn.service.WorkloadEventProducer;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.ttn.ck.apn.utils.ApnUtils.BATCH_SIZE;
@@ -35,65 +37,70 @@ public class WorkloadGenerationServiceImpl implements WorkloadGenerationService 
     @Override
     public void processUnprocessedWorkloads(RefreshMessage message) {
         log.info("Starting processing of unprocessed workloads. {}", message);
-        
         List<ApnOpportunityRawData> unprocessedData = apnOpportunityDataDao.fetchUnprocessedRawData();
         if (unprocessedData == null || unprocessedData.isEmpty()) {
             log.info("No unprocessed raw data found.");
             return;
         }
-
         Map<String, List<ApnOpportunityRawData>> groupedByCustomer = unprocessedData.stream()
                 .filter(data -> data.getCustomerName() != null)
                 .collect(Collectors.groupingBy(ApnOpportunityRawData::getCustomerName));
 
-        groupedByCustomer.forEach(this::processCustomerWorkloads);
-        
+        groupedByCustomer.forEach((key, value) -> processCustomerWorkloads(key, value, message.getPartnerName()));
         log.info("Finished processing unprocessed workloads.");
     }
 
-    private void processCustomerWorkloads(String customerName, List<ApnOpportunityRawData> customerRecords) {
+    private void processCustomerWorkloads(String customerName, List<ApnOpportunityRawData> customerRecords, String partnerName) {
         log.info("Processing {} records for customer: {}", customerRecords.size(), customerName);
-        
         for (int i = 0; i < customerRecords.size(); i += BATCH_SIZE) {
             int end = Math.min(i + BATCH_SIZE, customerRecords.size());
             List<ApnOpportunityRawData> batch = customerRecords.subList(i, end);
-            processBatch(batch);
+            processBatch(batch, partnerName);
         }
-
-        // After all data for customer is processed via ChatGPT, publish message to RabbitMQ
-        WorkloadEvent event = WorkloadEvent.builder()
-                .customerName(customerName)
-                .build();
-        
-        workloadEventProducer.publishWorkloadEvent(event);
     }
 
-    private void processBatch(List<ApnOpportunityRawData> batch) {
+    private void processBatch(List<ApnOpportunityRawData> batch, String partnerName) {
         if (batch.isEmpty()) return;
-
         try {
             String inputTable = formatRawDataAsTable(batch);
-            String fullPrompt = resourceLoaderService.loadFile("prompts/workload-generation-prompt.st")+ "\n\n" + inputTable;
+            String fullPrompt = resourceLoaderService.loadFile("prompts/workload-generation-prompt.st") + "\n\n" + inputTable;
             Object responseObj = chatClient.prompt()
                     .user(fullPrompt)
                     .call()
                     .entity(Object.class);
-            List<WorkloadResponseDTO> response = objectMapper.convertValue(responseObj, new TypeReference<>() {});
-
+            OpenAiResponseDTO responseDTO = objectMapper.convertValue(responseObj, new TypeReference<>() {});
+            List<WorkloadResponseDTO> response = objectMapper.convertValue(responseDTO.getData(), new TypeReference<>() {});
             if (response != null) {
-                log.debug("Received ChatGPT response for batch insertBatch {} and output {}", batch.size(), response.size());
-
-                // Update raw table for each item in the batch
-                for (WorkloadResponseDTO opportunityRawData : response) {
-                    apnOpportunityDataDao.updateWorkloadDetailsByLineItemUuid(
-                            opportunityRawData.getLineitemUuid(),
-                            opportunityRawData.getWorkloadTitle(),
-                            opportunityRawData.getWorkloadDescription());
-                }
+                log.info("Received ChatGPT response for batch insertBatch {} and output {}", batch.size(), response.size());
+                apnOpportunityDataDao.updateWorkloadDetailsByLineItemUuid(response);
+                publishMasterDataUpdateEvent(response, partnerName);
             }
         } catch (Exception e) {
             log.error("Failed to process batch through ChatGPT: {}", e.getMessage(), e);
         }
+    }
+
+    private void publishMasterDataUpdateEvent(List<WorkloadResponseDTO> response, String partnerName) {
+        log.info("Publish message to update master data for partner {} and size {}", response.size(), partnerName);
+        Map<String, List<WorkloadResponseDTO>> groupedByCustomer = response.stream()
+                .filter(data -> data.getWorkloadDescription() != null && data.getAccountId() != null)
+                .collect(Collectors.groupingBy(
+                        data -> data.getWorkloadDescription() + "_" + data.getAccountId()
+                ));
+        for (Map.Entry<String, List<WorkloadResponseDTO>> entry : groupedByCustomer.entrySet()) {
+            WorkloadResponseDTO item = entry.getValue().stream().findFirst().orElse(null);
+            if (Objects.nonNull(item)) {
+                WorkloadEvent event = WorkloadEvent.builder()
+                        .customerName(item.getCustomerName())
+                        .accountId(item.getAccountId())
+                        .partnerName(partnerName)
+                        .workloadDescription(item.getWorkloadDescription())
+                        .build();
+                log.info("Event to publish {}", event);
+                workloadEventProducer.publishWorkloadEvent(event);
+            }
+        }
+
     }
 
     private String formatRawDataAsTable(List<ApnOpportunityRawData> records) {

@@ -17,7 +17,7 @@ public class WorkloadEventProducer {
     @Value("${app.rabbitmq.exchange.opportunity}")
     private String exchangeName;
 
-    @Value("${app.rabbitmq.routing-key.opportunity-refresh}")
+    @Value("${app.rabbitmq.routing-key.master-refresh}")
     private String routingKey;
 
     public void publishWorkloadEvent(WorkloadEvent event) {

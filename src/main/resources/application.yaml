@@ -98,8 +98,9 @@ app:
   rabbitmq:
     queue:
       opportunity-refresh: opportunity-refresh-queue
+      master-data-refresh: opportunity-master-data-refresh-queue
     exchange:
       opportunity: opportunity-exchange
     routing-key:
       opportunity-refresh: opportunity.refresh
-
+      master-refresh: master.refresh
